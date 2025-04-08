@@ -1,4 +1,4 @@
-// src/app/main.tsx
+//src\app\main\page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,20 +11,6 @@ import { useRealtimeMessages } from '@/app/hooks/useRealtimeMessages';
 
 import { Contact, Message, MessageStatus } from '@/types';
 import { FaCog } from "react-icons/fa";
-
-// Define an interface for the raw message data we receive from the API
-interface RawMessageData {
-  id?: string;
-  content?: string;
-  timestamp?: string;
-  sender?: string;
-  status?: MessageStatus;
-  recipientId?: string;
-  attachments?: boolean;
-  // Define common expected properties instead of using [key: string]: any
-  text?: { body: string };
-  from?: string;
-}
 
 export default function Home() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -108,7 +94,7 @@ export default function Home() {
       sender: 'user',
       status: MessageStatus.PENDING,
       recipientId: selectedContact.phoneNumber,
-      attachments: false // Added the missing attachments property
+      attachments: false
     };
 
     // Update messages state with the new message
@@ -197,38 +183,13 @@ export default function Home() {
         console.log('Fetched Messages:', data);
         
         if (data.messages && Array.isArray(data.messages)) {
-          // Using a type assertion to avoid TypeScript errors
-          const apiMessages = data.messages as RawMessageData[];
-          
-          // Convert API messages to the expected Message format
-          const validatedMessages = apiMessages.map(msgData => {
-            // Construct a proper Message object with required fields
-            const messageObj: Message = {
-              id: msgData.id || Date.now().toString(),
-              content: msgData.content || (msgData.text?.body || ''),
-              timestamp: msgData.timestamp || new Date().toISOString(),
-              sender:
-  msgData.sender === 'user' || msgData.sender === 'contact'
-    ? msgData.sender
-    : msgData.from === 'user' || msgData.from === 'contact'
-    ? msgData.from
-    : 'contact', // default fallback
-
-              status: msgData.status || MessageStatus.DELIVERED,
-              recipientId: msgData.recipientId || 'me',
-              attachments: typeof msgData.attachments === 'boolean' ? msgData.attachments : false
-            };
-            
-            return messageObj;
-          });
-          
           setMessages(prev => ({
             ...prev,
-            [selectedContact.phoneNumber]: validatedMessages
+            [selectedContact.phoneNumber]: data.messages
           }));
           
           console.log(`Updated messages for ${selectedContact.phoneNumber}:`, 
-            validatedMessages.length);
+            data.messages.length);
         } else {
           console.warn('No messages found or invalid response', data);
         }
@@ -240,6 +201,7 @@ export default function Home() {
     fetchMessages();
   }, [selectedContact]);
 
+
   // Mock function to simulate receiving a message
   const simulateIncomingMessage = (contact: Contact, content: string) => {
     const incomingMessage: Message = {
@@ -249,7 +211,7 @@ export default function Home() {
       sender: 'contact',
       status: MessageStatus.DELIVERED,
       recipientId: 'me',
-      attachments: false  // Make sure attachments is included here too
+      attachments: false
     };
 
     setMessages(prev => {
@@ -319,13 +281,13 @@ export default function Home() {
             contact={selectedContact}
             messages={messages[selectedContact.phoneNumber] || []}
             onSendMessage={sendMessage}
-            onSimulateIncoming={() => simulateIncomingMessage(selectedContact, 'This is a test reply')} 
-            onCloseChat={() => setSelectedContact(null)}
-          />
+            onSimulateIncoming={() => simulateIncomingMessage(selectedContact, 'This is a test reply')} onCloseChat={function (): void {
+              throw new Error('Function not implemented.');
+            } }          />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
       <Image 
-        src="/image-removebg-preview (22).png"
+        src="/image-removebg-preview (22).png"  // Updated path for public/image.png
         alt="Background Image" 
         width={200} 
         height={200} 
