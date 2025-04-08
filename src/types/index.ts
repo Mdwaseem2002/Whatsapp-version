@@ -20,7 +20,6 @@ export interface Contact {
   
   // Message represents a chat message
   export interface Message {
-    attachments: boolean;
     id: string;
     content: string;
     timestamp: string;
@@ -32,6 +31,7 @@ export interface Contact {
     contactPhoneNumber?: string; // Add this field
     conversationId?: string;
     originalId?: string;
+    attachments: boolean | Array<unknown>; // Or whatever the correct type is
   }
 
   // WhatsApp configuration settings
