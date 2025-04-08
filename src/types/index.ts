@@ -20,15 +20,19 @@ export interface Contact {
   
   // Message represents a chat message
   export interface Message {
+    attachments: boolean;
     id: string;
     content: string;
     timestamp: string;
-    sender: 'user' | 'contact';
+    sender: 'user' | 'contact'; // 'user' is the current user, 'contact' is the recipient
     status: MessageStatus;
     recipientId: string;
-    attachments: boolean; // <- Confirm this is not marked as optional
+    mediaUrl?: string;
+    mediaType?: 'image' | 'audio' | 'video' | 'document';
+    contactPhoneNumber?: string; // Add this field
+    conversationId?: string;
+    originalId?: string;
   }
-  
 
   // WhatsApp configuration settings
   export interface WhatsAppConfig {
