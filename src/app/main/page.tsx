@@ -12,6 +12,20 @@ import { useRealtimeMessages } from '@/app/hooks/useRealtimeMessages';
 import { Contact, Message, MessageStatus } from '@/types';
 import { FaCog } from "react-icons/fa";
 
+// Define an interface for the raw message data we receive from the API
+interface RawMessageData {
+  id?: string;
+  content?: string;
+  timestamp?: string;
+  sender?: string;
+  status?: MessageStatus;
+  recipientId?: string;
+  attachments?: boolean;
+  // Define common expected properties instead of using [key: string]: any
+  text?: { body: string };
+  from?: string;
+}
+
 export default function Home() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
@@ -183,12 +197,30 @@ export default function Home() {
         console.log('Fetched Messages:', data);
         
         if (data.messages && Array.isArray(data.messages)) {
-          // Make sure each message has the required 'attachments' property
-          // Added explicit type to the msg parameter to fix the 'Parameter implicitly has an any type' error
-          const validatedMessages = data.messages.map((msg: { attachments?: boolean; [key: string]: unknown }) => ({
-            ...msg,
-            attachments: msg.attachments !== undefined ? msg.attachments : false
-          }));
+          // Using a type assertion to avoid TypeScript errors
+          const apiMessages = data.messages as RawMessageData[];
+          
+          // Convert API messages to the expected Message format
+          const validatedMessages = apiMessages.map(msgData => {
+            // Construct a proper Message object with required fields
+            const messageObj: Message = {
+              id: msgData.id || Date.now().toString(),
+              content: msgData.content || (msgData.text?.body || ''),
+              timestamp: msgData.timestamp || new Date().toISOString(),
+              sender:
+  msgData.sender === 'user' || msgData.sender === 'contact'
+    ? msgData.sender
+    : msgData.from === 'user' || msgData.from === 'contact'
+    ? msgData.from
+    : 'contact', // default fallback
+
+              status: msgData.status || MessageStatus.DELIVERED,
+              recipientId: msgData.recipientId || 'me',
+              attachments: typeof msgData.attachments === 'boolean' ? msgData.attachments : false
+            };
+            
+            return messageObj;
+          });
           
           setMessages(prev => ({
             ...prev,
