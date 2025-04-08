@@ -1,4 +1,4 @@
-//src\app\main\page.tsx
+// src/app/main.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -94,7 +94,7 @@ export default function Home() {
       sender: 'user',
       status: MessageStatus.PENDING,
       recipientId: selectedContact.phoneNumber,
-      attachments: false  // Use boolean value here, not an array
+      attachments: false  // Add the missing attachments property
     };
 
     // Update messages state with the new message
@@ -211,7 +211,7 @@ export default function Home() {
       sender: 'contact',
       status: MessageStatus.DELIVERED,
       recipientId: 'me',
-      attachments: false
+      attachments: false  // Make sure this is included here too
     };
 
     setMessages(prev => {
@@ -281,13 +281,13 @@ export default function Home() {
             contact={selectedContact}
             messages={messages[selectedContact.phoneNumber] || []}
             onSendMessage={sendMessage}
-            onSimulateIncoming={() => simulateIncomingMessage(selectedContact, 'This is a test reply')} onCloseChat={function (): void {
-              throw new Error('Function not implemented.');
-            } }          />
+            onSimulateIncoming={() => simulateIncomingMessage(selectedContact, 'This is a test reply')} 
+            onCloseChat={() => setSelectedContact(null)}  // Fixed the implementation here
+          />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
       <Image 
-        src="/image-removebg-preview (22).png"  // Updated path for public/image.png
+        src="/image-removebg-preview (22).png"
         alt="Background Image" 
         width={200} 
         height={200} 
