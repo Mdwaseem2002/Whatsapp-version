@@ -94,7 +94,7 @@ export default function Home() {
       sender: 'user',
       status: MessageStatus.PENDING,
       recipientId: selectedContact.phoneNumber,
-      attachments: false  // THIS IS THE KEY PART THAT WAS MISSING
+      attachments: false // Added the missing attachments property
     };
 
     // Update messages state with the new message
@@ -184,7 +184,8 @@ export default function Home() {
         
         if (data.messages && Array.isArray(data.messages)) {
           // Make sure each message has the required 'attachments' property
-          const validatedMessages = data.messages.map((msg: { attachments: undefined; }) => ({
+          // Added explicit type to the msg parameter to fix the 'Parameter implicitly has an any type' error
+          const validatedMessages = data.messages.map((msg: { attachments?: boolean; [key: string]: unknown }) => ({
             ...msg,
             attachments: msg.attachments !== undefined ? msg.attachments : false
           }));
