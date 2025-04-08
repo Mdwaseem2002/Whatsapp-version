@@ -23,23 +23,12 @@ export interface Contact {
     id: string;
     content: string;
     timestamp: string;
-    sender: 'user' | 'contact'; // 'user' is the current user, 'contact' is the recipient
+    sender: 'user' | 'contact';
     status: MessageStatus;
     recipientId: string;
-    mediaUrl?: string;
-    mediaType?: 'image' | 'audio' | 'video' | 'document';
-    contactPhoneNumber?: string; // Add this field
-    conversationId?: string;
-    originalId?: string;
-    attachments: boolean | Attachment[]; // Or whatever the correct type is
+    attachments: boolean; // <- Confirm this is not marked as optional
   }
-
-  export interface Attachment {
-    type: string;
-    url: string;
-    name?: string;
-    size?: number;
-  }
+  
 
   // WhatsApp configuration settings
   export interface WhatsAppConfig {
@@ -55,16 +44,6 @@ export interface Contact {
     entry: WebhookEntry[];
   }
   
-  // Define interface for API message response
-export interface ApiMessageResponse {
-  id: string;
-  text: { body: string };
-  timestamp: number;
-  from: string;
-  attachments?: boolean | Attachment[];
-  [key: string]: unknown; // For any other properties that might be in the response
-}
-
   export interface WebhookEntry {
     id: string;
     changes: WebhookChange[];
