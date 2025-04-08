@@ -1,4 +1,4 @@
-// src/app/main/page.tsx
+// src/app/main.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,7 +9,7 @@ import ChatWindow from '@/components/ChatWindow';
 import AddRecipientModal from '@/components/AddRecipientModel';
 import { useRealtimeMessages } from '@/app/hooks/useRealtimeMessages';
 
-import { Contact, Message, MessageStatus, ApiMessageResponse } from '@/types';
+import { Contact, Message, MessageStatus } from '@/types';
 import { FaCog } from "react-icons/fa";
 
 export default function Home() {
@@ -94,7 +94,7 @@ export default function Home() {
       sender: 'user',
       status: MessageStatus.PENDING,
       recipientId: selectedContact.phoneNumber,
-      attachments: false
+      attachments: false  // THIS IS THE KEY PART THAT WAS MISSING
     };
 
     // Update messages state with the new message
@@ -184,10 +184,10 @@ export default function Home() {
         
         if (data.messages && Array.isArray(data.messages)) {
           // Make sure each message has the required 'attachments' property
-          const validatedMessages = data.messages.map((msg: ApiMessageResponse) => ({
+          const validatedMessages = data.messages.map((msg: { attachments: undefined; }) => ({
             ...msg,
             attachments: msg.attachments !== undefined ? msg.attachments : false
-          })) as Message[];
+          }));
           
           setMessages(prev => ({
             ...prev,
@@ -207,7 +207,6 @@ export default function Home() {
     fetchMessages();
   }, [selectedContact]);
 
-
   // Mock function to simulate receiving a message
   const simulateIncomingMessage = (contact: Contact, content: string) => {
     const incomingMessage: Message = {
@@ -217,7 +216,7 @@ export default function Home() {
       sender: 'contact',
       status: MessageStatus.DELIVERED,
       recipientId: 'me',
-      attachments: false
+      attachments: false  // Make sure attachments is included here too
     };
 
     setMessages(prev => {
