@@ -96,6 +96,7 @@ export default function Home() {
       recipientId: selectedContact.phoneNumber,
       attachments: false
     };
+    
 
     // Update messages state with the new message
     setMessages(prev => {
