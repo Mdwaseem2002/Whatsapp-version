@@ -94,9 +94,8 @@ export default function Home() {
       sender: 'user',
       status: MessageStatus.PENDING,
       recipientId: selectedContact.phoneNumber,
-      attachments: false
+      attachments: false  // Use boolean value here, not an array
     };
-    
 
     // Update messages state with the new message
     setMessages(prev => {
