@@ -1,4 +1,4 @@
-// src/app/main.tsx
+// src/app/main/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,7 +9,7 @@ import ChatWindow from '@/components/ChatWindow';
 import AddRecipientModal from '@/components/AddRecipientModel';
 import { useRealtimeMessages } from '@/app/hooks/useRealtimeMessages';
 
-import { Contact, Message, MessageStatus } from '@/types';
+import { Contact, Message, MessageStatus, ApiMessageResponse } from '@/types';
 import { FaCog } from "react-icons/fa";
 
 export default function Home() {
@@ -94,7 +94,7 @@ export default function Home() {
       sender: 'user',
       status: MessageStatus.PENDING,
       recipientId: selectedContact.phoneNumber,
-      attachments: false  // Add the missing attachments property
+      attachments: false
     };
 
     // Update messages state with the new message
@@ -183,13 +183,19 @@ export default function Home() {
         console.log('Fetched Messages:', data);
         
         if (data.messages && Array.isArray(data.messages)) {
+          // Make sure each message has the required 'attachments' property
+          const validatedMessages = data.messages.map((msg: ApiMessageResponse) => ({
+            ...msg,
+            attachments: msg.attachments !== undefined ? msg.attachments : false
+          })) as Message[];
+          
           setMessages(prev => ({
             ...prev,
-            [selectedContact.phoneNumber]: data.messages
+            [selectedContact.phoneNumber]: validatedMessages
           }));
           
           console.log(`Updated messages for ${selectedContact.phoneNumber}:`, 
-            data.messages.length);
+            validatedMessages.length);
         } else {
           console.warn('No messages found or invalid response', data);
         }
@@ -211,7 +217,7 @@ export default function Home() {
       sender: 'contact',
       status: MessageStatus.DELIVERED,
       recipientId: 'me',
-      attachments: false  // Make sure this is included here too
+      attachments: false
     };
 
     setMessages(prev => {
@@ -282,7 +288,7 @@ export default function Home() {
             messages={messages[selectedContact.phoneNumber] || []}
             onSendMessage={sendMessage}
             onSimulateIncoming={() => simulateIncomingMessage(selectedContact, 'This is a test reply')} 
-            onCloseChat={() => setSelectedContact(null)}  // Fixed the implementation here
+            onCloseChat={() => setSelectedContact(null)}
           />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
